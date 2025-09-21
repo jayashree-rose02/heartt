@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Scan & Learn AR - Heart Module</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- A-Frame Library -->
+  <script src="https://aframe.io/releases/1.4.1/aframe.min.js"></script>
+  <!-- AR.js Library -->
+  <script src="https://cdn.jsdelivr.net/npm/ar-js-org@3.3.2/aframe/build/aframe-ar.js"></script>
+  <style>
+    body { margin:0; font-family: 'Segoe UI', sans-serif; overflow:hidden; background:#000; }
+    /* Splash screen */
+    #splash {
+      position:absolute; top:0; left:0; width:100%; height:100%; 
+      background:linear-gradient(135deg,#008080,#00cccc); color:white; 
+      display:flex; flex-direction:column; justify-content:center; align-items:center; z-index:10;
+    }
+    #splash h1 { font-size:2.5em; margin-bottom:20px; text-align:center; }
+    #splash button {
+      padding:15px 30px; font-size:1.2em; border:none; border-radius:10px; cursor:pointer; 
+      background:#fff; color:#008080; font-weight:bold; transition:0.3s;
+    }
+    #splash button:hover { background:#f0f0f0; }
+    /* Marker guide overlay */
+    #markerGuide {
+      position:absolute; bottom:20px; left:50%; transform:translateX(-50%);
+      width:150px; height:150px; border:2px dashed #fff; display:flex; justify-content:center; align-items:center;
+      font-size:0.9em; color:#fff; text-align:center; z-index:5;
+    }
+    /* Info card */
+    #infoCard {
+      position:absolute; top:20px; left:50%; transform:translateX(-50%);
+      background:rgba(255,255,255,0.95); color:#008080; padding:20px; border-radius:10px; 
+      text-align:center; display:none; z-index:5; max-width:300px; font-weight:bold;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Splash Screen -->
+<div id="splash">
+  <h1>Scan & Learn AR</h1>
+  <p>Click below to start your AR experience</p>
+  <button id="startARBtn">Start AR</button>
+</div>
+
+<!-- Marker Guide -->
+<div id="markerGuide">Point camera at the heart marker</div>
+
+<!-- Info Card -->
+<div id="infoCard">
+  <h3>❤️ Heart AR</h3>
+  <p>The heart model appears here!</p>
+</div>
+
+<script>
+  const splash = document.getElementById('splash');
+  const startBtn = document.getElementById('startARBtn');
+  const infoCard = document.getElementById('infoCard');
+
+  startBtn.addEventListener('click', () => {
+    // Hide splash
+    splash.style.display = 'none';
+
+    // Create AR scene dynamically
+    const scene = document.createElement('a-scene');
+    scene.setAttribute('embedded','');
+    scene.setAttribute('arjs','sourceType: webcam; debugUIEnabled: false;');
+
+    // Marker
+    const marker = document.createElement('a-marker');
+    marker.setAttribute('type','pattern');
+    marker.setAttribute('url','assets/heart.patt');
+
+    // 3D Heart Model
+    const heart = document.createElement('a-entity');
+    heart.setAttribute('gltf-model','assets/heart.glb');
+    heart.setAttribute('scale','0.5 0.5 0.5');
+    heart.setAttribute('animation','property: rotation; to: 0 360 0; loop: true; dur: 5000');
+    heart.setAttribute('animation__pulse','property: scale; dir: alternate; dur: 1000; loop: true; to: 0.6 0.6 0.6');
+
+    marker.appendChild(heart);
+    scene.appendChild(marker);
+
+    // Camera
+    const camera = document.createElement('a-entity');
+    camera.setAttribute('camera','');
+    scene.appendChild(camera);
+
+    document.body.appendChild(scene);
+
+    // Show info card when marker is detected
+    marker.addEventListener('markerFound', () => {
+      infoCard.style.display = 'block';
+    });
+    marker.addEventListener('markerLost', () => {
+      infoCard.style.display = 'none';
+    });
+  });
+</script>
+
+</body>
+</html>
